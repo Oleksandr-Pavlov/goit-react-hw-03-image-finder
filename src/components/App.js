@@ -4,7 +4,7 @@ import { SearchForm } from "./SearchForm/SearchForm";
 
 export class App extends Component {
   state = {
-    searchQuery: ''
+    searchQuery: '',
   };
 
   handleFormSubmit = searchQuery => {
