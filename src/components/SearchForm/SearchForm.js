@@ -1,40 +1,26 @@
-import { Component } from 'react';
 import { Notify } from 'notiflix';
 import css from './SearchForm.module.css';
 
-export class SearchForm extends Component {
-  state = {
-    searchQuery: '',
-  };
-
-  handleQueryChange = e => {
-    this.setState({ searchQuery: e.currentTarget.value.toLowerCase() });
-  };
-
-  handleSubmit = e => {
+export const SearchForm = ({onSubmit}) => {
+  const handleSubmit = e => {
     e.preventDefault()
 
-    const { searchQuery } = this.state;
+    if (e.currentTarget[1].value.trim() === '') return Notify.failure('Enter some query please');
 
-    if (searchQuery.trim() === '') return Notify.failure('Enter some query please')
-
-    this.props.onSubmit(searchQuery)
-    this.setState({ searchQuery: '' });
+    onSubmit(e.currentTarget[1].value);
+    e.currentTarget[1].value = '';
   };
 
-  render() {
     return (
       <header className={css.Searchbar}>
-        <form className={css.SearchForm} onSubmit={this.handleSubmit}>
+        <form className={css.SearchForm} onSubmit={handleSubmit}>
           <button type="submit" className={css.SearchFormButton}>
             <span className={css.SearchFormButtonLabel}>Search</span>
           </button>
 
           <input
             className={css.SearchFormInput}
-            onChange={this.handleQueryChange}
             name="searchQuery"
-            value={this.state.searchQuery}
             type="text"
             autoComplete="off"
             autoFocus
@@ -44,4 +30,3 @@ export class SearchForm extends Component {
       </header>
     );
   }
-};
