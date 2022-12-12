@@ -27,8 +27,9 @@ export class Modal extends Component {
       <div className={css.Overlay} onClick={this.onBackdropClick}>
         <div className={css.Modal}>
           <img
-              src={this.props.selectedPicture}
+              src={this.props.src}
               alt="Here should be the bigger size of selected pic."
+              width='1000px'
             />
         </div>
       </div>

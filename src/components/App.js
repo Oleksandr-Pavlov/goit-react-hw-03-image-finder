@@ -5,6 +5,7 @@ import { Button } from 'components/Button/Button';
 import { Modal } from '../components/Modal/Modal';
 import { getPicturesByApi } from '../service/getPicturesByApi';
 import { Notify } from "notiflix";
+import { Spinner } from "./Spinner/Spinner";
 
 export class App extends Component {
   state = {
@@ -17,7 +18,7 @@ export class App extends Component {
   };
 
   handleFormSubmit = searchQuery => {
-    this.setState({ searchQuery });
+    this.setState({ searchQuery, pictures: [], page: 1 });
   };
 
   componentDidUpdate = (_, prevState) => {
@@ -28,14 +29,13 @@ export class App extends Component {
 
       getPicturesByApi(searchQuery, page)
         .then(pictures => {
-          pictures.data.hits.length === 0 &&
-            Notify.warning('Please, enter anything else to search');
+          if (pictures.data.hits.length === 0) Notify.warning('Please enter valid search query');
 
-          if (prevState.query !== searchQuery) {
-            this.setState({ pictures: [...pictures.data.hits] });
+          if (prevState.searchQuery !== searchQuery) {
+            this.setState({ pictures: [...pictures.data.hits]});
           } else
             this.setState({
-              pictures: [...prevState.pictures, ...pictures.data.hits]
+              pictures: [...prevState.pictures, ...pictures.data.hits],
             });
         })
         .catch(error => this.setState({ error }))
@@ -61,8 +61,8 @@ export class App extends Component {
     return (
       <>
         <SearchForm onSubmit={this.handleFormSubmit} />
-        {error && <h1>{error.message}</h1>}
-        {loading && <p>Loading...</p>}
+        {error && <h1>Oops, {error.message}. Please reload the page</h1>}
+        {loading && <Spinner/>}
         <ImageGallery pictures={pictures} onSelectPicture={this.onSelectPicture} />
         {pictures.length > 0 && <Button onLoadMore={this.handleButtonClick} />}
         {selectedPicture !== null && (
