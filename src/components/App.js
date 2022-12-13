@@ -15,6 +15,7 @@ export class App extends Component {
     loading: false,
     error: null,
     selectedPicture: null,
+    showLoadMore: false
   };
 
   handleFormSubmit = searchQuery => {
@@ -29,17 +30,17 @@ export class App extends Component {
 
       getPicturesByApi(searchQuery, page)
         .then(pictures => {
-          if (pictures.data.hits.length === 0) Notify.warning('Please enter valid search query');
+          if (pictures.data.hits.length === 0)
+            Notify.warning('Please enter valid search query');
+          
+          if (pictures.data.totalHits > 12 && page < Math.ceil(pictures.data.totalHits / 12)) this.setState({ showLoadMore: true })
+          else { this.setState({ showLoadMore: false }) }
 
-          if (prevState.searchQuery !== searchQuery) {
-            this.setState({ pictures: [...pictures.data.hits]});
-          } else
-            this.setState({
-              pictures: [...prevState.pictures, ...pictures.data.hits],
-            });
+          if (prevState.searchQuery !== searchQuery) this.setState({ pictures: [...pictures.data.hits] })
+          else this.setState({ pictures: [...prevState.pictures, ...pictures.data.hits] });
         })
         .catch(error => this.setState({ error }))
-        .finally(() => this.setState({ loading: false }));
+        .finally(() => this.setState({loading: false}));
     }
   };
 
@@ -56,7 +57,7 @@ export class App extends Component {
   };
 
   render() {
-    const { pictures, error, loading, selectedPicture } = this.state;
+    const { pictures, error, loading, selectedPicture, showLoadMore } = this.state;
 
     return (
       <>
@@ -64,7 +65,7 @@ export class App extends Component {
         {error && <h1>Oops, {error.message}. Please reload the page</h1>}
         {loading && <Spinner/>}
         <ImageGallery pictures={pictures} onSelectPicture={this.onSelectPicture} />
-        {pictures.length > 0 && <Button onLoadMore={this.handleButtonClick} />}
+        {showLoadMore && <Button onLoadMore={this.handleButtonClick} />}
         {selectedPicture !== null && (
           <Modal src={selectedPicture} closeModal={this.closeModal}/>
         )}
